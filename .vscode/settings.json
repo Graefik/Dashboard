@@ -1,0 +1,20 @@
+{
+  "[go]": {
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": true
+    }
+  },
+
+  // Outils Go
+  "go.formatTool": "goimports",
+  "go.lintOnSave": "package",
+  "go.vetOnSave": "package",
+
+  // Auto-complétion
+  "go.useLanguageServer": true,
+
+  // Raccourcis utiles
+  "editor.formatOnType": true,
+  "editor.formatOnPaste": true
+}
