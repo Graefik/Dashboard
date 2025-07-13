@@ -1,0 +1,37 @@
+services:
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_API_URL=http://localhost:8080
+    command: pnpm dev --host 0.0.0.0
+    depends_on:
+      - server
+    networks:
+      - dev-network
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./server:/app
+    environment:
+      - GIN_MODE=debug
+      - GO_ENV=development
+    command: air
+    networks:
+      - dev-network
+
+networks:
+  dev-network:
+    driver: bridge
