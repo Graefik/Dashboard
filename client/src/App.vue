@@ -1,14 +1,15 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div id="app">
-    <router-view />
+    <div id="wrapper">
+      <header id="header">Header</header>
+      <main>
+        <router-view />
+      </main>
+    </div>
+    <footer id="footer">Footer</footer>
   </div>
 </template>
 
-<style>
-#app {
-  padding: 20px;
-}
-</style>
+<style></style>
