@@ -8,7 +8,6 @@
 .wrapper {
   height: 100%;
   width: 100%;
-  padding: 0 20px;
 
   margin-left: auto;
   margin-right: auto;
