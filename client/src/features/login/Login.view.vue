@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Wrapper from "@/shared/components/Wrapper.vue";
+import Button from "@/shared/ui/Button.vue";
 </script>
 
 <template>
@@ -27,7 +28,7 @@ import Wrapper from "@/shared/components/Wrapper.vue";
             required
           />
         </div>
-        <button class="login__form-button" type="submit">Connexion</button>
+        <Button type="submit">Connexion</Button>
       </form>
     </div>
   </Wrapper>
@@ -35,6 +36,12 @@ import Wrapper from "@/shared/components/Wrapper.vue";
 
 <style scoped lang="scss">
 .login {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+
   &__header {
     text-align: center;
     margin-bottom: 3rem;
@@ -46,7 +53,8 @@ import Wrapper from "@/shared/components/Wrapper.vue";
   }
 
   &__form {
-    max-width: 650px;
+    width: 100%;
+    max-width: 600px;
     background-color: $primary-fg;
     border-radius: 30px;
     padding: 3rem 6rem 5rem;
@@ -96,31 +104,6 @@ import Wrapper from "@/shared/components/Wrapper.vue";
       outline: none;
       background-color: rgba(255, 255, 255, 0.1);
       box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-    }
-  }
-
-  &__form-button {
-    background-color: $cta;
-    border-radius: 12px;
-    padding: 14px 32px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    border: none;
-    width: 100%;
-    color: $white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 1rem;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-
-    &:hover {
-      background-color: darken($cta, 5%);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    &:active {
-      transform: translateY(0);
     }
   }
 }
