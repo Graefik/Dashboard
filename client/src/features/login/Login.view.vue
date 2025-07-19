@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Wrapper from "@/shared/components/Wrapper.vue";
 import Button from "@/shared/ui/Button.vue";
+import Input from "@/shared/ui/Input.vue";
 </script>
 
 <template>
@@ -17,11 +18,11 @@ import Button from "@/shared/ui/Button.vue";
       <form>
         <div class="login__field">
           <label for="email" class="login__field-label">Email</label>
-          <input type="email" id="email" class="login__field-input" required />
+          <Input type="email" id="email" class="login__field-input" required />
         </div>
         <div class="login__field">
           <label for="password" class="login__field-label">Mot de passe</label>
-          <input
+          <Input
             type="password"
             id="password"
             class="login__field-input"
@@ -68,42 +69,16 @@ import Button from "@/shared/ui/Button.vue";
       margin: 0 1rem;
     }
   }
-
-  &__title {
-    margin-bottom: 2rem;
-    color: $white;
-    font-size: 2rem;
-    font-weight: 600;
-  }
-
   &__field {
     margin-bottom: 2rem;
     text-align: left;
-  }
 
-  &__field-label {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    display: block;
-    color: rgba($white, 0.9);
-    font-size: 0.95rem;
-  }
-
-  &__field-input {
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    font-size: 1rem;
-    background-color: rgba(255, 255, 255, 0.05);
-    color: $white;
-    transition: all 0.3s ease;
-
-    &:focus {
-      border-color: $cta;
-      outline: none;
-      background-color: rgba(255, 255, 255, 0.1);
-      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    &-label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: block;
+      color: $white;
+      font-size: 0.95rem;
     }
   }
 }
