@@ -4,7 +4,10 @@
     :type="type"
     :placeholder="placeholder"
     :disabled="disabled"
-    :required="required"
+    :value="modelValue"
+    @input="
+      $emit('update:modelValue', ($event.target as HTMLInputElement).value)
+    "
   />
 </template>
 
@@ -13,18 +16,18 @@ interface Props {
   type?: "text" | "email" | "password";
   placeholder?: string;
   disabled?: boolean;
-  required?: boolean;
+  modelValue?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   type: "text",
   placeholder: "",
   disabled: false,
-  required: false,
+  modelValue: "",
 });
 
 defineEmits<{
-  input: [value: string];
+  "update:modelValue": [value: string];
 }>();
 </script>
 <style scoped lang="scss">

@@ -2,6 +2,37 @@
 import Wrapper from "@/shared/components/Wrapper.vue";
 import Button from "@/shared/ui/Button.vue";
 import Input from "@/shared/ui/Input.vue";
+
+import { toTypedSchema } from "@vee-validate/zod";
+import { useForm } from "vee-validate";
+import * as zod from "zod";
+
+const validationSchema = toTypedSchema(
+  zod.object({
+    email: zod
+      .string({ message: "Email est requis" })
+      .email({ message: "Doit être un email valide" }),
+    password: zod
+      .string({ message: "Mot de passe est requis" })
+      .min(8, { message: "Trop court" }),
+  })
+);
+
+const { handleSubmit, errors, defineField } = useForm({
+  validationSchema,
+  validateOnMount: false,
+});
+
+const [email, emailProps] = defineField("email", {
+  validateOnModelUpdate: false,
+});
+const [password, passwordProps] = defineField("password", {
+  validateOnModelUpdate: false,
+});
+
+const onSubmit = handleSubmit((values) => {
+  alert(JSON.stringify(values, null, 2));
+});
 </script>
 
 <template>
@@ -15,10 +46,16 @@ import Input from "@/shared/ui/Input.vue";
     </div>
     <div class="login__form">
       <h1 class="login__title">Connexion</h1>
-      <form>
+      <form @submit="onSubmit" novalidate>
         <div class="login__field">
           <label for="email" class="login__field-label">Email</label>
-          <Input type="email" id="email" class="login__field-input" required />
+          <Input
+            id="email"
+            class="login__field-input"
+            v-model="email"
+            v-bind="emailProps"
+          />
+          <span class="login__field-error">{{ errors.email }}</span>
         </div>
         <div class="login__field">
           <label for="password" class="login__field-label">Mot de passe</label>
@@ -26,8 +63,10 @@ import Input from "@/shared/ui/Input.vue";
             type="password"
             id="password"
             class="login__field-input"
-            required
+            v-model="password"
+            v-bind="passwordProps"
           />
+          <span class="login__field-error">{{ errors.password }}</span>
         </div>
         <Button type="submit">Connexion</Button>
       </form>
@@ -79,6 +118,12 @@ import Input from "@/shared/ui/Input.vue";
       display: block;
       color: $white;
       font-size: 0.95rem;
+    }
+
+    &-error {
+      color: $error;
+      font-size: 0.85rem;
+      margin-top: 0.25rem;
     }
   }
 }
