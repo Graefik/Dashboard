@@ -31,7 +31,7 @@ defineEmits<{
   background-color: $cta;
   border-radius: 12px;
   padding: 14px 32px;
-  font-size: 1.1rem;
+  font-size: 1.6rem;
   font-weight: 600;
   border: none;
   width: 100%;

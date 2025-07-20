@@ -59,12 +59,11 @@ const onSubmit = handleSubmit((values) => {
       margin-bottom: 0.5rem;
       display: block;
       color: $white;
-      font-size: 0.95rem;
     }
 
     &-error {
       color: $error;
-      font-size: 0.85rem;
+      font-size: 1.4rem;
       margin-top: 0.25rem;
     }
   }

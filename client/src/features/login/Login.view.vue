@@ -32,20 +32,20 @@ import LoginForm from "@/features/login/components/login.form.vue";
     margin-bottom: 3rem;
 
     &-logo {
-      width: 200px;
+      width: 20rem;
       height: auto;
     }
   }
 
   &__form {
     width: 100%;
-    max-width: 600px;
+    max-width: 60rem;
     background-color: $primary-fg;
-    border-radius: 30px;
+    border-radius: 3rem;
     padding: 3rem 6rem 5rem;
     margin: 0 auto;
     text-align: center;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
 
     @media (max-width: 768px) {
