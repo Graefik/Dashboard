@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import MainLayout from "@/shared/layouts/MainLayout.vue";
 import type { ApexOptions } from "apexcharts";
 import { ref } from "vue";
 
@@ -88,19 +87,17 @@ const chartOptions = ref<ApexOptions>({
 </script>
 
 <template>
-  <MainLayout>
+  <div>
+    <h1>Dashboard</h1>
+    <p>Welcome to the dashboard!</p>
     <div>
-      <h1>Dashboard</h1>
-      <p>Welcome to the dashboard!</p>
-      <div>
-        <apexchart
-          width="500"
-          type="bar"
-          :options="chartOptions"
-          :series="series"
-        ></apexchart>
-      </div>
-      <router-link to="/login">Go to Login</router-link>
+      <apexchart
+        width="500"
+        type="bar"
+        :options="chartOptions"
+        :series="series"
+      ></apexchart>
     </div>
-  </MainLayout>
+    <router-link to="/login">Go to Login</router-link>
+  </div>
 </template>
