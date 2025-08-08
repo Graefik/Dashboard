@@ -88,7 +88,7 @@ const onSubmit = handleSubmit(async (values) => {
     </div>
 
     <div class="login__actions">
-      <Button type="submit" :disabled="isLoading" class="login__submit-btn">
+      <Button type="submit" :disabled="isLoading" variant="primary" class="login__submit-btn">
         <span v-if="!isLoading">Connexion</span>
         <span v-else aria-live="polite">Connexion en cours...</span>
       </Button>

@@ -1,10 +1,18 @@
+<script setup lang="ts">
+import Footer from "@/shared/components/Footer.vue";
+import Header from "@/shared/components/Header.vue";
+import Wrapper from "@/shared/components/Wrapper.vue";
+</script>
+
 <template>
   <div class="main-layout">
-    <header class="main-layout__header">Header</header>
+    <Header />
     <main class="main-layout__main">
-      <slot />
+      <Wrapper>
+        <slot />
+      </Wrapper>
     </main>
-    <footer class="main-layout__footer">Footer</footer>
+    <Footer />
   </div>
 </template>
 
@@ -14,22 +22,10 @@
   display: flex;
   flex-direction: column;
 
-  &__header {
-    background-color: $primary-fg;
-    padding: 1rem;
-    color: $white;
-  }
-
   &__main {
     flex: 1;
-    padding: 2rem;
-  }
-
-  &__footer {
-    background-color: $primary-fg;
-    padding: 1rem;
-    color: $white;
-    text-align: center;
+    background-color: $primary-bg;
+    padding: 8rem 0;
   }
 }
 </style>
