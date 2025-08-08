@@ -7,7 +7,7 @@ import Wrapper from "@/shared/components/Wrapper.vue";
     <Wrapper class="header__wrapper">
       <div class="header__content">
         <div class="header__brand">
-          <img src="@/assets/logo.png" alt="Graefik" class="header__logo" />
+          <img src="@/assets/icon.png" alt="Graefik" class="header__logo" />
           <span class="header__title">Graefik</span>
         </div>
         <nav class="header__nav">
