@@ -28,10 +28,66 @@ services:
     environment:
       - GIN_MODE=debug
       - GO_ENV=development
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=dashboard
+      - DB_PASSWORD=dashboard_pwd
+      - DB_NAME=dashboard_dev
     command: air
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - dev-network
+
+  mysql:
+    image: mysql:latest
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_pwd
+      - MYSQL_DATABASE=dashboard_dev
+      - MYSQL_USER=dashboard
+      - MYSQL_PASSWORD=dashboard_pwd
+      - TZ=UTC
+    volumes:
+      - mysql_data_dev:/var/lib/mysql
+    networks:
+      - dev-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-proot_pwd",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=mysql
+      - ADMINER_DESIGN=pepa-linha
+    depends_on:
+      - mysql
     networks:
       - dev-network
 
 networks:
   dev-network:
     driver: bridge
+
+volumes:
+  mysql_data_dev:

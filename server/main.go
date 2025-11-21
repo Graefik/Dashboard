@@ -1,10 +1,23 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"net/http"
+	"os"
+
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
 )
+
+type Utilisateur struct {
+	ID             uint   `gorm:"primaryKey"`
+	Email          string `gorm:"uniqueIndex;size:255;not null"`
+	MotDePasse     string `gorm:"size:255;not null"`
+	NomUtilisateur string `gorm:"uniqueIndex;size:100;not null"`
+}
 
 func main() {
 	r := gin.Default()
@@ -14,5 +27,31 @@ func main() {
 			"message": "Hello World!"})
 	})
 
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		getEnv("DB_USER", "dashboard"),
+		getEnv("DB_PASSWORD", "dashboard_pwd"),
+		getEnv("DB_HOST", "mysql"),
+		getEnv("DB_PORT", "3306"),
+		getEnv("DB_NAME", "dashboard_dev"),
+	)
+
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("connexion DB échouée: %v", err)
+	}
+
+	if err := db.AutoMigrate(&Utilisateur{}); err != nil {
+		log.Fatalf("migration échouée: %v", err)
+	}
+
+	log.Println("DB prête.")
+
 	r.Run(":8080")
+}
+
+func getEnv(k, def string) string {
+	if v := os.Getenv(k); v != "" {
+		return v
+	}
+	return def
 }
