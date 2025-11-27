@@ -1,8 +1,11 @@
 package main
 
 import (
+	"crypto/rand"
+	"errors"
 	"fmt"
 	"log"
+	"math/big"
 	"net/http"
 	"os"
 
@@ -43,10 +46,40 @@ func main() {
 	if err := db.AutoMigrate(&Utilisateur{}); err != nil {
 		log.Fatalf("migration échouée: %v", err)
 	}
+	var user Utilisateur
+	result := db.Where("nom_utilisateur = ?", "admin").First(&user)
 
+	if result.Error != nil && errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		pass, err2 := GeneratePassword(24)
+		if err2 != nil {
+			log.Println("Error when creating password")
+		}
+		user := Utilisateur{Email: "", MotDePasse: pass, NomUtilisateur: "admin"}
+		log.Println("Mot de passe" + pass)
+		db.Create(&user)
+	}
+	log.Println("Mot de passe " + user.MotDePasse)
 	log.Println("DB prête.")
-
 	r.Run(":8080")
+}
+
+const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-_=+"
+
+func GeneratePassword(n int) (string, error) {
+	if n > 24 {
+		n = 24
+	}
+
+	pass := make([]byte, n)
+	for i := range pass {
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(letters))))
+		if err != nil {
+			return "", err
+		}
+		pass[i] = letters[num.Int64()]
+	}
+
+	return string(pass), nil
 }
 
 func getEnv(k, def string) string {
