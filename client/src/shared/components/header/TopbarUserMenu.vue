@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useRouter } from "vue-router";
 import {
   DropdownMenuContent,
@@ -9,23 +10,35 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "reka-ui";
+import { useAuth } from "@/shared/auth/useAuth";
 
 const router = useRouter();
+const auth = useAuth();
+
+const initials = computed(() => {
+  const name = auth.username.value ?? "?";
+  return name.slice(0, 2).toUpperCase();
+});
+
+const onLogout = () => {
+  auth.logout();
+  router.push({ name: "login" });
+};
 </script>
 
 <template>
   <DropdownMenuRoot>
     <DropdownMenuTrigger as-child>
       <button class="user" type="button" aria-label="Compte">
-        <div class="user__avatar" aria-hidden="true">CM</div>
+        <div class="user__avatar" aria-hidden="true">{{ initials }}</div>
       </button>
     </DropdownMenuTrigger>
     <DropdownMenuPortal>
       <DropdownMenuContent class="dd" :side-offset="10" align="end">
         <DropdownMenuLabel class="dd__label">
           <div class="dd__user">
-            <div class="dd__user-name">Clément Maillet</div>
-            <div class="dd__user-mail mono">cmaillet@inovera.fr</div>
+            <div class="dd__user-name">{{ auth.username.value ?? "Utilisateur" }}</div>
+            <div class="dd__user-mail mono">connecté</div>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator class="dd__sep" />
@@ -73,7 +86,7 @@ const router = useRouter();
           Documentation
         </DropdownMenuItem>
         <DropdownMenuSeparator class="dd__sep" />
-        <DropdownMenuItem class="dd__item dd__item--danger">
+        <DropdownMenuItem class="dd__item dd__item--danger" @select="onLogout">
           <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
             <path
               d="M6 13.5H3.5A1.5 1.5 0 0 1 2 12V4A1.5 1.5 0 0 1 3.5 2.5H6"

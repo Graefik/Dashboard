@@ -3,11 +3,12 @@ import * as zod from "zod";
 
 export default toTypedSchema(
   zod.object({
-    email: zod
-      .string({ message: "Email est requis" })
-      .email({ message: "Doit être un email valide" }),
+    username: zod
+      .string({ message: "Identifiant requis" })
+      .min(1, { message: "Identifiant requis" })
+      .max(100, { message: "Identifiant trop long" }),
     password: zod
-      .string({ message: "Mot de passe est requis" })
-      .min(8, { message: "Trop court" }),
-  })
+      .string({ message: "Mot de passe requis" })
+      .min(1, { message: "Mot de passe requis" }),
+  }),
 );
