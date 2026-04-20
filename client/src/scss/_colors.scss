@@ -1,6 +1,93 @@
+// ──────────────────────────────────────────────────────────────────────────
+// GRAEFIK — Design tokens
+// Palette primaire issue de l'identité Go : navy profond + teal gopher
+// ──────────────────────────────────────────────────────────────────────────
+
+// Primary (préservés — ne pas renommer, utilisés par l'existant)
 $primary-bg: #0c2c44;
 $primary-fg: #081d2c;
 $cta: #00c2b2ea;
 $black: #000000;
 $white: #ffffff;
 $error: #f16969;
+
+// ── Backgrounds (échelle d'élévation) ────────────────────────────────────
+$bg-base: #06182a;       // fond de page (plus profond que primary-bg pour donner de l'espace)
+$bg-surface: #0a2236;    // cartes / panneaux
+$bg-surface-2: #081d2f;  // bas de gradient surface
+$bg-elevated: #0d2a40;   // hover / surfaces soulevées
+$bg-inset: #050f1c;      // zones enfoncées (inputs, code)
+$bg-inset-hi: #0a1a2a;   // inset au hover
+$bg-rail: #04121f;       // sidebar
+$bg-rail-2: #020b13;     // bas de gradient rail
+
+// ── Borders ─────────────────────────────────────────────────────────────
+$border-subtle: rgba(255, 255, 255, 0.06);
+$border-default: rgba(255, 255, 255, 0.09);
+$border-strong: rgba(255, 255, 255, 0.14);
+$border-accent: rgba(0, 194, 178, 0.35);
+
+// ── Text ────────────────────────────────────────────────────────────────
+$text-primary: #e8f4f3;
+$text-secondary: #93b4c2;
+$text-muted: #5a7d8e;
+$text-faint: #3a5768;
+
+// ── Accents ─────────────────────────────────────────────────────────────
+$accent: #00c2b2;
+$accent-glow: #2ce8d8;
+$accent-deep: #0b6f66;
+$accent-soft: rgba(0, 194, 178, 0.12);
+$accent-wash: rgba(0, 194, 178, 0.04);
+
+// ── Severity ────────────────────────────────────────────────────────────
+$severity-success: #2dd4a7;
+$severity-warning: #f5a524;
+$severity-danger: #f16969;
+$severity-critical: #e0416b;
+$severity-info: #58a6ff;
+
+// Tints pour backgrounds de statut
+$severity-success-soft: rgba(45, 212, 167, 0.12);
+$severity-warning-soft: rgba(245, 165, 36, 0.12);
+$severity-danger-soft: rgba(241, 105, 105, 0.12);
+$severity-info-soft: rgba(88, 166, 255, 0.12);
+
+// ── Chart series (8 couleurs harmonisées, dominantes teal) ─────────────
+$series-1: #00c2b2;
+$series-2: #2ce8d8;
+$series-3: #58a6ff;
+$series-4: #8b5cf6;
+$series-5: #f5a524;
+$series-6: #f16969;
+$series-7: #2dd4a7;
+$series-8: #94a3b8;
+
+// ── Shadows ─────────────────────────────────────────────────────────────
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
+$shadow-lg: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 8px 16px -8px rgba(0, 0, 0, 0.4);
+$shadow-glow: 0 0 24px rgba(0, 194, 178, 0.25);
+$shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+// ── Radii ───────────────────────────────────────────────────────────────
+$radius-xs: 4px;
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 14px;
+$radius-xl: 20px;
+$radius-pill: 999px;
+
+// ── Easings ─────────────────────────────────────────────────────────────
+$ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+$ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+$ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+// ── Typo ────────────────────────────────────────────────────────────────
+$font-sans: "Geist", "Inter Tight", -apple-system, BlinkMacSystemFont, sans-serif;
+$font-mono: "Geist Mono", "JetBrains Mono", "SF Mono", "Menlo", monospace;
+
+// ── Layout ──────────────────────────────────────────────────────────────
+$rail-width: 22rem;
+$topbar-height: 6.4rem;
+$statusbar-height: 3.2rem;

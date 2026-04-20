@@ -1,110 +1,310 @@
-* {
+// ──────────────────────────────────────────────────────────────────────────
+// GRAEFIK — Global stylesheet
+// ──────────────────────────────────────────────────────────────────────────
+
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
 html {
   height: 100%;
   scroll-behavior: smooth;
-  font-size: 62.5%;
+  font-size: 62.5%; // 1rem = 10px
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
   position: relative;
-  height: 100%;
-  background-color: $primary-bg;
-  font-family: "ABeeZee", sans-serif;
-  color: $white;
-  font-weight: 500;
-  font-size: 1.6rem;
+  min-height: 100%;
+  margin: 0;
+  background-color: $bg-base;
+  background-image:
+    // dotted grid (signature observability)
+    radial-gradient(
+      circle at 1px 1px,
+      rgba(255, 255, 255, 0.035) 1px,
+      transparent 0
+    ),
+    // aura teal en haut-gauche
+    radial-gradient(
+      ellipse 80rem 60rem at 0% 0%,
+      rgba(0, 194, 178, 0.07) 0%,
+      transparent 50%
+    ),
+    // aura sourde en bas-droite
+    radial-gradient(
+      ellipse 60rem 50rem at 100% 100%,
+      rgba(88, 166, 255, 0.04) 0%,
+      transparent 50%
+    );
+  background-size: 2.4rem 2.4rem, 100% 100%, 100% 100%;
+  background-attachment: fixed;
+  font-family: $font-sans;
+  color: $text-primary;
+  font-weight: 400;
+  font-size: 1.4rem;
   line-height: 1.5;
+  letter-spacing: -0.005em;
 
   #app {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-
-    #wrapper {
-      flex-grow: 1;
-    }
-
-    #footer {
-      flex-shrink: 0;
-    }
   }
 }
 
-h1 {
-  font-size: 3.2rem;
-  font-weight: 700;
-  line-height: 1.2;
-  margin: 0 0 2.4rem 0;
-  letter-spacing: -0.02em;
+::selection {
+  background: rgba(0, 194, 178, 0.28);
+  color: $white;
 }
 
-h2 {
-  font-size: 2.8rem;
-  font-weight: 700;
-  line-height: 1.25;
-  margin: 0 0 2rem 0;
-  letter-spacing: -0.01em;
+// ── Scrollbar ───────────────────────────────────────────────────────────
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 194, 178, 0.4);
+  background-clip: padding-box;
+  border: 2px solid transparent;
 }
 
-h3 {
-  font-size: 2.4rem;
-  font-weight: 600;
-  line-height: 1.3;
-  margin: 0 0 1.6rem 0;
-}
-
-h4 {
-  font-size: 2rem;
-  font-weight: 600;
-  line-height: 1.35;
-  margin: 0 0 1.2rem 0;
-}
-
-h5 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  line-height: 1.4;
-  margin: 0 0 1rem 0;
-}
-
+// ── Typographie ─────────────────────────────────────────────────────────
+h1,
+h2,
+h3,
+h4,
+h5,
 h6 {
-  font-size: 1.6rem;
+  margin: 0;
+  color: $text-primary;
   font-weight: 600;
-  line-height: 1.4;
-  margin: 0 0 0.8rem 0;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+h1 {
+  font-size: 2.8rem;
+  font-weight: 600;
+}
+h2 {
+  font-size: 2.2rem;
+}
+h3 {
+  font-size: 1.7rem;
+}
+h4 {
+  font-size: 1.5rem;
+}
+h5 {
+  font-size: 1.3rem;
+}
+h6 {
+  font-size: 1.2rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  color: $text-muted;
 }
 
 p {
-  font-size: 1.6rem;
-  font-weight: 400;
+  margin: 0;
+  font-size: 1.4rem;
   line-height: 1.6;
-  margin: 0 0 1.6rem 0;
+  color: $text-secondary;
 }
 
-span {
-  font-size: inherit;
-  font-weight: inherit;
-  line-height: inherit;
+a {
+  color: $accent;
+  text-decoration: none;
+  transition: color 0.15s $ease-out;
+
+  &:hover {
+    color: $accent-glow;
+  }
+}
+
+code,
+kbd,
+samp,
+.mono {
+  font-family: $font-mono;
+  font-feature-settings: "zero", "ss01";
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: $text-secondary;
+  background: $bg-inset;
+  border: 1px solid $border-default;
+  border-radius: $radius-sm;
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  font-family: $font-mono;
 }
 
 label {
-  font-size: 1.4rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 500;
   line-height: 1.4;
-  color: $white;
+  color: $text-secondary;
   display: block;
   margin-bottom: 0.8rem;
+  letter-spacing: 0.02em;
 }
 
 button {
-  font-size: 1.6rem;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0.01em;
   font-family: inherit;
+  font-size: 1.4rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.005em;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  color: inherit;
+}
+
+// ── Helpers ─────────────────────────────────────────────────────────────
+.mono {
+  font-family: $font-mono;
+  font-variant-numeric: tabular-nums;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: $font-mono;
+  font-size: 1.05rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: $text-muted;
+}
+
+// ── Animations globales ─────────────────────────────────────────────────
+@keyframes graefik-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.85);
+  }
+}
+
+@keyframes graefik-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes graefik-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// ── ApexCharts overrides ────────────────────────────────────────────────
+.apexcharts-tooltip {
+  background: $bg-surface !important;
+  border: 1px solid $border-default !important;
+  border-radius: $radius-md !important;
+  box-shadow: $shadow-lg !important;
+  font-family: $font-mono !important;
+  font-size: 1.15rem !important;
+  color: $text-primary !important;
+  padding: 0.4rem 0 !important;
+}
+
+.apexcharts-tooltip-title {
+  background: $bg-inset !important;
+  border-bottom: 1px solid $border-default !important;
+  font-family: $font-mono !important;
+  color: $text-muted !important;
+  font-size: 1.05rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.6rem 1rem !important;
+  margin: 0 !important;
+}
+
+.apexcharts-tooltip-series-group {
+  padding: 0.3rem 1rem !important;
+}
+
+.apexcharts-tooltip-marker {
+  border-radius: 2px !important;
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.apexcharts-xaxistooltip,
+.apexcharts-yaxistooltip {
+  background: $bg-inset !important;
+  border: 1px solid $border-default !important;
+  border-radius: $radius-sm !important;
+  color: $text-primary !important;
+  font-family: $font-mono !important;
+  font-size: 1.05rem !important;
+}
+
+.apexcharts-xaxistooltip-bottom::before,
+.apexcharts-xaxistooltip-bottom::after {
+  border-bottom-color: $border-default !important;
+}
+
+.apexcharts-legend-text {
+  color: $text-secondary !important;
+  font-family: $font-sans !important;
+  font-size: 1.2rem !important;
+}
+
+.apexcharts-menu {
+  background: $bg-surface !important;
+  border: 1px solid $border-default !important;
+  border-radius: $radius-md !important;
+}
+
+.apexcharts-menu-item {
+  color: $text-secondary !important;
+  font-size: 1.2rem !important;
+
+  &:hover {
+    background: $bg-elevated !important;
+    color: $text-primary !important;
+  }
 }

@@ -1,16 +1,26 @@
+<script setup lang="ts">
+interface Props {
+  bleed?: boolean;
+}
+withDefaults(defineProps<Props>(), { bleed: false });
+</script>
+
 <template>
-  <div class="wrapper">
-    <slot></slot>
+  <div class="wrapper" :class="{ 'wrapper--bleed': bleed }">
+    <slot />
   </div>
 </template>
 
 <style lang="scss" scoped>
 .wrapper {
-  height: 100%;
   width: 100%;
+  margin: 0 auto;
+  padding: 0 2.4rem;
+  max-width: 144rem;
 
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 1280px;
+  &--bleed {
+    max-width: none;
+    padding: 0;
+  }
 }
 </style>
