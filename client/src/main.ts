@@ -3,7 +3,7 @@ import { createApp } from "vue";
 import VueApexCharts from "vue3-apexcharts";
 import App from "./App.vue";
 import router from "./router";
-import "./scss/layout.scss";
+import "./scss/main.scss";
 
 const app = createApp(App);
 app.use(router);

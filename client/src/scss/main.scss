@@ -1,0 +1,11 @@
+// ──────────────────────────────────────────────────────────────────────────
+// Entry point des styles globaux.
+// Chaque partial contient une seule responsabilité.
+// _colors est déjà injecté via vite.config.ts (additionalData).
+// ──────────────────────────────────────────────────────────────────────────
+
+@use "./base";
+@use "./typography";
+@use "./animations";
+@use "./apex";
+@use "./dropdown";

@@ -1,0 +1,103 @@
+@use "./colors" as *;
+
+// ──────────────────────────────────────────────────────────────────────────
+// Dropdown menu base (.dd) — partagé entre Header/Sidebar
+// Les variants spécifiques (ex: .dd--env) vivent avec leur composant.
+// Ces styles sont globaux car Reka UI téléporte le content hors du tree.
+// ──────────────────────────────────────────────────────────────────────────
+
+.dd {
+  min-width: 22rem;
+  padding: 0.4rem;
+  background: $bg-surface;
+  border: 1px solid $border-default;
+  border-radius: $radius-md;
+  box-shadow: $shadow-lg, $shadow-inset;
+  z-index: 60;
+  animation: dd-in 0.14s $ease-out;
+
+  &__label {
+    padding: 0.8rem 1rem 0.6rem;
+  }
+
+  &__user-name {
+    color: $text-primary;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+
+  &__user-mail {
+    color: $text-muted;
+    font-size: 1.15rem;
+    margin-top: 0.2rem;
+  }
+
+  &__sep {
+    height: 1px;
+    background: $border-subtle;
+    margin: 0.4rem 0.2rem;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.7rem 1rem;
+    border-radius: $radius-sm;
+    color: $text-secondary;
+    font-size: 1.3rem;
+    cursor: pointer;
+    outline: none;
+    transition:
+      background 0.1s $ease-out,
+      color 0.1s $ease-out;
+
+    svg {
+      color: $text-muted;
+      flex-shrink: 0;
+    }
+
+    &[data-highlighted] {
+      background: $accent-soft;
+      color: $text-primary;
+
+      svg {
+        color: $accent-glow;
+      }
+    }
+
+    &--danger {
+      color: $severity-danger;
+      svg {
+        color: $severity-danger;
+      }
+
+      &[data-highlighted] {
+        background: $severity-danger-soft;
+        color: $severity-danger;
+      }
+    }
+  }
+
+  &__kbd {
+    margin-left: auto;
+    padding: 0.15rem 0.5rem;
+    background: $bg-inset;
+    border: 1px solid $border-subtle;
+    border-radius: $radius-xs;
+    font-family: $font-mono;
+    font-size: 1rem;
+    color: $text-muted;
+  }
+}
+
+@keyframes dd-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

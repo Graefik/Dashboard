@@ -1,0 +1,75 @@
+@use "./colors" as *;
+
+// ──────────────────────────────────────────────────────────────────────────
+// Overrides ApexCharts (thème dark Graefik)
+// ──────────────────────────────────────────────────────────────────────────
+
+.apexcharts-tooltip {
+  background: $bg-surface !important;
+  border: 1px solid $border-default !important;
+  border-radius: $radius-md !important;
+  box-shadow: $shadow-lg !important;
+  font-family: $font-mono !important;
+  font-size: 1.15rem !important;
+  color: $text-primary !important;
+  padding: 0.4rem 0 !important;
+}
+
+.apexcharts-tooltip-title {
+  background: $bg-inset !important;
+  border-bottom: 1px solid $border-default !important;
+  font-family: $font-mono !important;
+  color: $text-muted !important;
+  font-size: 1.05rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.6rem 1rem !important;
+  margin: 0 !important;
+}
+
+.apexcharts-tooltip-series-group {
+  padding: 0.3rem 1rem !important;
+}
+
+.apexcharts-tooltip-marker {
+  border-radius: 2px !important;
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.apexcharts-xaxistooltip,
+.apexcharts-yaxistooltip {
+  background: $bg-inset !important;
+  border: 1px solid $border-default !important;
+  border-radius: $radius-sm !important;
+  color: $text-primary !important;
+  font-family: $font-mono !important;
+  font-size: 1.05rem !important;
+}
+
+.apexcharts-xaxistooltip-bottom::before,
+.apexcharts-xaxistooltip-bottom::after {
+  border-bottom-color: $border-default !important;
+}
+
+.apexcharts-legend-text {
+  color: $text-secondary !important;
+  font-family: $font-sans !important;
+  font-size: 1.2rem !important;
+}
+
+.apexcharts-menu {
+  background: $bg-surface !important;
+  border: 1px solid $border-default !important;
+  border-radius: $radius-md !important;
+}
+
+.apexcharts-menu-item {
+  color: $text-secondary !important;
+  font-size: 1.2rem !important;
+
+  &:hover {
+    background: $bg-elevated !important;
+    color: $text-primary !important;
+  }
+}

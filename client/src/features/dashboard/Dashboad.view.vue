@@ -5,6 +5,7 @@ import KpiCard from "@/shared/ui/KpiCard.vue";
 import Panel from "@/shared/ui/Panel.vue";
 import StatusPill from "@/shared/ui/StatusPill.vue";
 import Button from "@/shared/ui/Button.vue";
+import UPlot, { type UPlotSeries } from "@/shared/ui/UPlot.vue";
 
 // ── Palette de séries : 1 accent teal + échelle neutre, statuts sémantiques ──
 const series = {
@@ -18,7 +19,7 @@ const series = {
   slateDeep: "#556978",
 };
 
-// ── Base config partagé pour tous les charts ─────────────────────────────
+// ── Base config Apex (utilisée uniquement pour donut + bar horizontal + sparklines KPI) ──
 const baseChart: Partial<ApexOptions> = {
   chart: {
     toolbar: { show: false },
@@ -58,61 +59,34 @@ const axisCommon = {
   axisTicks: { show: false },
 };
 
-// ── KPIs (mock data, branchés à l'API Traefik plus tard) ────────────────
+// ── KPIs ────────────────────────────────────────────────────────────────
 const spark = (base: number, variance: number, n = 24) =>
   Array.from({ length: n }, (_, i) =>
-    Math.max(0, Math.round(base + Math.sin(i / 2.2) * variance + (Math.random() - 0.5) * variance * 0.6)),
+    Math.max(
+      0,
+      Math.round(base + Math.sin(i / 2.2) * variance + (Math.random() - 0.5) * variance * 0.6),
+    ),
   );
 
 const kpis = ref([
-  {
-    label: "Requests / sec",
-    value: "1 284",
-    unit: "req/s",
-    delta: 8.4,
-    deltaLabel: "vs. 6h",
-    tone: "accent" as const,
-    icon: "requests" as const,
-    trend: spark(1200, 180),
-  },
-  {
-    label: "Latency p95",
-    value: "42",
-    unit: "ms",
-    delta: -3.1,
-    deltaLabel: "vs. 6h",
-    tone: "info" as const,
-    icon: "latency" as const,
-    trend: spark(45, 10),
-  },
-  {
-    label: "Active connections",
-    value: "3 412",
-    unit: "conns",
-    delta: 2.6,
-    deltaLabel: "vs. 6h",
-    tone: "success" as const,
-    icon: "connections" as const,
-    trend: spark(3300, 250),
-  },
-  {
-    label: "Error rate",
-    value: "0.42",
-    unit: "%",
-    delta: 12.8,
-    deltaLabel: "vs. 6h",
-    tone: "danger" as const,
-    icon: "errors" as const,
-    trend: spark(18, 8),
-  },
+  { label: "Requests / sec", value: "1 284", unit: "req/s", delta: 8.4, deltaLabel: "vs. 6h", tone: "accent" as const, icon: "requests" as const, trend: spark(1200, 180) },
+  { label: "Latency p95", value: "42", unit: "ms", delta: -3.1, deltaLabel: "vs. 6h", tone: "info" as const, icon: "latency" as const, trend: spark(45, 10) },
+  { label: "Active connections", value: "3 412", unit: "conns", delta: 2.6, deltaLabel: "vs. 6h", tone: "success" as const, icon: "connections" as const, trend: spark(3300, 250) },
+  { label: "Error rate", value: "0.42", unit: "%", delta: 12.8, deltaLabel: "vs. 6h", tone: "danger" as const, icon: "errors" as const, trend: spark(18, 8) },
 ]);
 
-// ── Chart 1 : Requests timeline (area, double série) ─────────────────────
-const buildTimePoints = (n = 60, base = 900, variance = 300) => {
-  const now = Date.now();
-  return Array.from({ length: n }, (_, i) => ({
-    x: now - (n - i) * 60_000,
-    y: Math.max(
+// ── Chart uPlot : Requests timeline (stacked area) ────────────────────────
+// Format natif uPlot : [timestamps_secondes, y1, y2, ...]
+const genTs = (n: number, stepMs: number) => {
+  const now = Math.floor(Date.now() / 1000);
+  return Array.from({ length: n }, (_, i) =>
+    now - Math.floor(((n - 1 - i) * stepMs) / 1000),
+  );
+};
+
+const genY = (n: number, base: number, variance: number) =>
+  Array.from({ length: n }, (_, i) =>
+    Math.max(
       0,
       Math.round(
         base +
@@ -121,55 +95,38 @@ const buildTimePoints = (n = 60, base = 900, variance = 300) => {
           (Math.random() - 0.5) * variance * 0.4,
       ),
     ),
-  }));
-};
+  );
 
-const requestsSeries = ref([
-  { name: "2xx/3xx", data: buildTimePoints(60, 1100, 240) },
-  { name: "4xx", data: buildTimePoints(60, 90, 40) },
-  { name: "5xx", data: buildTimePoints(60, 14, 10) },
+const timelineXs = genTs(60, 60_000);
+const timelineData = ref<number[][]>([
+  timelineXs,
+  genY(60, 1100, 240),
+  genY(60, 90, 40),
+  genY(60, 14, 10),
 ]);
 
-const requestsOptions = computed<ApexOptions>(() => ({
-  ...baseChart,
-  chart: { ...baseChart.chart, type: "area", stacked: true, height: 320 },
-  colors: [series.teal, series.amber, series.red],
-  stroke: { curve: "smooth", width: 2, lineCap: "round" },
-  fill: {
-    type: "gradient",
-    gradient: {
-      shadeIntensity: 1,
-      opacityFrom: 0.35,
-      opacityTo: 0.02,
-      stops: [0, 95],
-    },
-  },
-  xaxis: {
-    ...axisCommon,
-    type: "datetime",
-    labels: {
-      ...axisCommon.labels,
-      datetimeUTC: false,
-      format: "HH:mm",
-    },
-    tooltip: { enabled: false },
-  },
-  yaxis: {
-    ...axisCommon,
-    labels: {
-      ...axisCommon.labels,
-      formatter: (v: number) => `${v.toFixed(0)}`,
-    },
-  },
-  tooltip: {
-    ...baseChart.tooltip,
-    x: { format: "HH:mm:ss" },
-    y: { formatter: (v: number) => `${v.toLocaleString("fr-FR")} req` },
-  },
-  markers: { size: 0, hover: { size: 5 } },
-}));
+const timelineSeries: UPlotSeries[] = [
+  { label: "2xx/3xx", color: series.teal, width: 2 },
+  { label: "4xx", color: series.amber, width: 2 },
+  { label: "5xx", color: series.red, width: 2 },
+];
 
-// ── Chart 2 : Status codes (donut) ───────────────────────────────────────
+// ── Chart uPlot : Latency percentiles ────────────────────────────────────
+const latencyXs = genTs(48, 300_000);
+const latencyData = ref<number[][]>([
+  latencyXs,
+  Array.from({ length: 48 }, () => 10 + Math.random() * 6),
+  Array.from({ length: 48 }, () => 32 + Math.random() * 18),
+  Array.from({ length: 48 }, () => 80 + Math.random() * 60),
+]);
+
+const latencySeriesCfg: UPlotSeries[] = [
+  { label: "p50", color: series.slate, width: 2, fill: null },
+  { label: "p95", color: series.teal, width: 2.5, fill: null },
+  { label: "p99", color: series.amber, width: 2, fill: null, dash: [4, 4] },
+];
+
+// ── Apex : Status codes (donut) ──────────────────────────────────────────
 const statusSeries = ref([73245, 18420, 6210, 892, 148]);
 const statusOptions = computed<ApexOptions>(() => ({
   ...baseChart,
@@ -223,59 +180,7 @@ const statusOptions = computed<ApexOptions>(() => ({
   dataLabels: { enabled: false },
 }));
 
-// ── Chart 3 : Latency percentiles (line) ─────────────────────────────────
-const latencySeries = ref([
-  { name: "p50", data: Array.from({ length: 48 }, () => 10 + Math.random() * 6) },
-  { name: "p95", data: Array.from({ length: 48 }, () => 32 + Math.random() * 18) },
-  { name: "p99", data: Array.from({ length: 48 }, () => 80 + Math.random() * 60) },
-]);
-
-const latencyCategories = Array.from({ length: 48 }, (_, i) => {
-  const d = new Date(Date.now() - (48 - i) * 300_000);
-  return d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-});
-
-const latencyOptions = computed<ApexOptions>(() => ({
-  ...baseChart,
-  chart: { ...baseChart.chart, type: "line", height: 320 },
-  colors: [series.slate, series.teal, series.amber],
-  stroke: { curve: "smooth", width: [2, 2.5, 2], dashArray: [0, 0, 4] },
-  xaxis: {
-    ...axisCommon,
-    categories: latencyCategories,
-    labels: {
-      ...axisCommon.labels,
-      rotate: 0,
-      hideOverlappingLabels: true,
-    },
-    tickAmount: 8,
-  },
-  yaxis: {
-    ...axisCommon,
-    labels: {
-      ...axisCommon.labels,
-      formatter: (v: number) => `${v.toFixed(0)}ms`,
-    },
-  },
-  tooltip: {
-    ...baseChart.tooltip,
-    y: { formatter: (v: number) => `${v.toFixed(1)} ms` },
-  },
-  markers: { size: 0, hover: { size: 5 } },
-  legend: {
-    show: true,
-    position: "top",
-    horizontalAlign: "right",
-    fontFamily: "Geist Mono, monospace",
-    fontSize: "1.15rem",
-    labels: { colors: "#93b4c2" },
-    markers: {
-      strokeWidth: 0,
-    },
-  },
-}));
-
-// ── Chart 4 : Top routers (bar horizontal) ───────────────────────────────
+// ── Apex : Top routers (bar horizontal) ──────────────────────────────────
 const topRouters = ref([
   { name: "api.myapp.com", rps: 412 },
   { name: "app.myapp.com", rps: 318 },
@@ -319,25 +224,10 @@ const routersOptions = computed<ApexOptions>(() => ({
   xaxis: {
     ...axisCommon,
     categories: topRouters.value.map((r) => r.name),
-    labels: {
-      ...axisCommon.labels,
-      formatter: (v: string) => `${v} r/s`,
-    },
+    labels: { ...axisCommon.labels, formatter: (v: string) => `${v} r/s` },
   },
-  yaxis: {
-    ...axisCommon,
-    labels: {
-      ...axisCommon.labels,
-      style: {
-        ...axisCommon.labels.style,
-        fontFamily: "Geist Mono, monospace",
-      },
-    },
-  },
-  tooltip: {
-    ...baseChart.tooltip,
-    y: { formatter: (v: number) => `${v} req/s` },
-  },
+  yaxis: { ...axisCommon },
+  tooltip: { ...baseChart.tooltip, y: { formatter: (v: number) => `${v} req/s` } },
   dataLabels: {
     enabled: true,
     textAnchor: "end",
@@ -380,7 +270,6 @@ const providerColor: Record<string, string> = {
 
 <template>
   <div class="graefik-dashboard">
-    <!-- Page header ─────────────────────────────────────────────────── -->
     <header class="page-head">
       <div class="page-head__titles">
         <div class="eyebrow">
@@ -400,7 +289,13 @@ const providerColor: Record<string, string> = {
       <div class="page-head__actions">
         <Button variant="subtle" size="sm">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path d="M7 1v8m0 0L4 6m3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path
+              d="M7 1v8m0 0L4 6m3 3 3-3"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
             <path d="M2 11h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
           </svg>
           Exporter
@@ -425,14 +320,18 @@ const providerColor: Record<string, string> = {
         </Button>
         <Button size="sm">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-            <path d="M7 3v8M3 7h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+            <path
+              d="M7 3v8M3 7h8"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
           </svg>
           Nouveau panneau
         </Button>
       </div>
     </header>
 
-    <!-- KPIs row ────────────────────────────────────────────────────── -->
     <section class="kpi-row">
       <KpiCard
         v-for="(kpi, idx) in kpis"
@@ -449,11 +348,10 @@ const providerColor: Record<string, string> = {
       />
     </section>
 
-    <!-- Grid principal ─────────────────────────────────────────────── -->
     <section class="grid">
       <Panel
         title="Requests over time"
-        subtitle="Stacked par famille de code HTTP"
+        subtitle="Stacked par famille de code HTTP · rendu uPlot"
         eyebrow="Timeline"
         :span="8"
         live
@@ -472,12 +370,12 @@ const providerColor: Record<string, string> = {
             </span>
           </div>
         </template>
-        <apexchart
-          type="area"
-          height="320"
-          width="100%"
-          :options="requestsOptions"
-          :series="requestsSeries"
+        <UPlot
+          :data="timelineData"
+          :series="timelineSeries"
+          :height="300"
+          stacked
+          :y-formatter="(v: number) => v.toLocaleString('fr-FR') + ' req'"
         />
       </Panel>
 
@@ -508,17 +406,29 @@ const providerColor: Record<string, string> = {
 
       <Panel
         title="Response time percentiles"
-        subtitle="p50 · p95 · p99 — fenêtre glissante 4h"
+        subtitle="p50 · p95 · p99 — fenêtre glissante 4h · rendu uPlot"
         eyebrow="Latency"
         :span="7"
         pad="tight"
       >
-        <apexchart
-          type="line"
-          height="320"
-          width="100%"
-          :options="latencyOptions"
-          :series="latencySeries"
+        <template #actions>
+          <div class="panel-chips">
+            <span class="panel-chip panel-chip--slate">
+              <span class="panel-chip__dot"></span> p50
+            </span>
+            <span class="panel-chip panel-chip--teal">
+              <span class="panel-chip__dot"></span> p95
+            </span>
+            <span class="panel-chip panel-chip--amber">
+              <span class="panel-chip__dot panel-chip__dot--dashed"></span> p99
+            </span>
+          </div>
+        </template>
+        <UPlot
+          :data="latencyData"
+          :series="latencySeriesCfg"
+          :height="300"
+          :y-formatter="(v: number) => v.toFixed(0) + 'ms'"
         />
       </Panel>
 
@@ -538,7 +448,6 @@ const providerColor: Record<string, string> = {
         />
       </Panel>
 
-      <!-- Services table ─────────────────────────────────────── -->
       <Panel
         title="Services health"
         subtitle="Détection automatique des providers"
@@ -610,7 +519,6 @@ const providerColor: Record<string, string> = {
   gap: 2.4rem;
 }
 
-// ── Page head ────────────────────────────────────────────────────
 .page-head {
   display: flex;
   align-items: flex-start;
@@ -680,7 +588,6 @@ const providerColor: Record<string, string> = {
   }
 }
 
-// ── KPI row ────────────────────────────────────────────────────
 .kpi-row {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -694,14 +601,12 @@ const providerColor: Record<string, string> = {
   }
 }
 
-// ── Grid principal ─────────────────────────────────────────────
 .grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 1.6rem;
 }
 
-// ── Chips pour header de panel ────────────────────────────────
 .panel-chips {
   display: inline-flex;
   gap: 0.4rem;
@@ -723,6 +628,13 @@ const providerColor: Record<string, string> = {
     width: 6px;
     height: 6px;
     border-radius: 2px;
+
+    &--dashed {
+      background: transparent !important;
+      border: 1px dashed currentColor;
+      width: 8px;
+      height: 0;
+    }
   }
 
   &--teal &__dot {
@@ -730,13 +642,16 @@ const providerColor: Record<string, string> = {
   }
   &--amber &__dot {
     background: $severity-warning;
+    color: $severity-warning;
   }
   &--red &__dot {
     background: $severity-danger;
   }
+  &--slate &__dot {
+    background: $series-8;
+  }
 }
 
-// ── Legend ─────────────────────────────────────────────────────
 .legend {
   display: flex;
   align-items: center;
@@ -762,7 +677,6 @@ const providerColor: Record<string, string> = {
   }
 }
 
-// ── Services table ────────────────────────────────────────────
 .svc-table {
   display: flex;
   flex-direction: column;
