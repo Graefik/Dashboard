@@ -12,21 +12,7 @@ const route = useRoute();
 
 const sections: { title?: string; items: NavItem[] }[] = [
   {
-    items: [
-      { label: "Overview", to: "/", icon: "overview" },
-      { label: "Traffic", to: "/traffic", icon: "traffic" },
-      { label: "Latency", to: "/latency", icon: "latency" },
-      { label: "Errors", to: "/errors", icon: "errors", badge: "3" },
-    ],
-  },
-  {
-    title: "Infrastructure",
-    items: [
-      { label: "Routers", to: "/routers", icon: "router" },
-      { label: "Services", to: "/services", icon: "services" },
-      { label: "Middlewares", to: "/middlewares", icon: "middleware" },
-      { label: "Certificates", to: "/certificates", icon: "cert" },
-    ],
+    items: [{ label: "Overview", to: "/", icon: "overview" }],
   },
   {
     title: "Console",
@@ -318,7 +304,7 @@ const isActive = (to: string) => {
     flex-shrink: 0;
     object-fit: contain;
     border-radius: $radius-sm;
-    filter: drop-shadow(0 0 12px rgba(0, 194, 178, 0.35));
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.5));
   }
 
   &__brand-text {

@@ -6,16 +6,16 @@ import Panel from "@/shared/ui/Panel.vue";
 import StatusPill from "@/shared/ui/StatusPill.vue";
 import Button from "@/shared/ui/Button.vue";
 
-// ── Palette de séries (depuis le design system) ──────────────────────────
+// ── Palette de séries : 1 accent teal + échelle neutre, statuts sémantiques ──
 const series = {
   teal: "#00c2b2",
   tealGlow: "#2ce8d8",
-  blue: "#58a6ff",
-  violet: "#8b5cf6",
+  tealDeep: "#0b6f66",
   amber: "#f5a524",
   red: "#f16969",
   green: "#2dd4a7",
   slate: "#94a3b8",
+  slateDeep: "#556978",
 };
 
 // ── Base config partagé pour tous les charts ─────────────────────────────
@@ -175,7 +175,7 @@ const statusOptions = computed<ApexOptions>(() => ({
   ...baseChart,
   chart: { ...baseChart.chart, type: "donut", height: 320 },
   labels: ["2xx OK", "3xx Redirect", "4xx Client", "5xx Server", "Timeouts"],
-  colors: [series.teal, series.blue, series.amber, series.red, series.violet],
+  colors: [series.teal, series.tealDeep, series.amber, series.red, series.slate],
   stroke: { width: 2, colors: ["#0a2236"] },
   plotOptions: {
     pie: {
@@ -238,7 +238,7 @@ const latencyCategories = Array.from({ length: 48 }, (_, i) => {
 const latencyOptions = computed<ApexOptions>(() => ({
   ...baseChart,
   chart: { ...baseChart.chart, type: "line", height: 320 },
-  colors: [series.green, series.teal, series.violet],
+  colors: [series.slate, series.teal, series.amber],
   stroke: { curve: "smooth", width: [2, 2.5, 2], dashArray: [0, 0, 4] },
   xaxis: {
     ...axisCommon,
@@ -435,7 +435,7 @@ const providerColor: Record<string, string> = {
     <!-- KPIs row ────────────────────────────────────────────────────── -->
     <section class="kpi-row">
       <KpiCard
-        v-for="kpi in kpis"
+        v-for="(kpi, idx) in kpis"
         :key="kpi.label"
         :label="kpi.label"
         :value="kpi.value"
@@ -445,6 +445,7 @@ const providerColor: Record<string, string> = {
         :tone="kpi.tone"
         :icon="kpi.icon"
         :trend="kpi.trend"
+        :hero="idx === 0"
       />
     </section>
 
@@ -497,10 +498,10 @@ const providerColor: Record<string, string> = {
         <template #footer>
           <div class="legend">
             <span class="legend__item"><span class="legend__dot" style="background:#00c2b2"></span> 2xx</span>
-            <span class="legend__item"><span class="legend__dot" style="background:#58a6ff"></span> 3xx</span>
+            <span class="legend__item"><span class="legend__dot" style="background:#0b6f66"></span> 3xx</span>
             <span class="legend__item"><span class="legend__dot" style="background:#f5a524"></span> 4xx</span>
             <span class="legend__item"><span class="legend__dot" style="background:#f16969"></span> 5xx</span>
-            <span class="legend__item"><span class="legend__dot" style="background:#8b5cf6"></span> timeout</span>
+            <span class="legend__item"><span class="legend__dot" style="background:#94a3b8"></span> timeout</span>
           </div>
         </template>
       </Panel>
@@ -646,18 +647,11 @@ const providerColor: Record<string, string> = {
 
   &__title {
     margin-top: 0.8rem;
-    font-size: 3.2rem;
+    font-size: 2.6rem;
     font-weight: 600;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
-    background: linear-gradient(
-      180deg,
-      $text-primary 0%,
-      $text-secondary 100%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    color: $text-primary;
   }
 
   &__subtitle {

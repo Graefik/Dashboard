@@ -171,11 +171,10 @@ import LoginForm from "@/features/login/components/login.form.vue";
   }
 
   &__logo {
-    width: 12rem;
+    width: 11rem;
     height: auto;
     border-radius: $radius-md;
-    box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.5),
-      0 0 28px rgba(0, 194, 178, 0.25);
+    box-shadow: 0 10px 28px -12px rgba(0, 0, 0, 0.55);
   }
 
   &__brand-meta {
@@ -207,17 +206,15 @@ import LoginForm from "@/features/login/components/login.form.vue";
 
   &__headline {
     margin-top: 1.2rem;
-    font-size: 4.2rem;
-    font-weight: 600;
-    line-height: 1.05;
-    letter-spacing: -0.03em;
+    font-size: 3.4rem;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
     color: $text-primary;
 
     &-accent {
-      background: linear-gradient(135deg, $accent-glow 0%, $accent 50%, $severity-info 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: $text-secondary;
+      font-weight: 400;
     }
   }
 

@@ -93,20 +93,15 @@ defineEmits<{
 
   // Variants
   &--primary {
-    background: linear-gradient(180deg, $accent-glow 0%, $accent 100%);
+    background: $accent;
     color: $bg-rail;
     font-weight: 600;
     box-shadow:
-      0 0 0 1px rgba(0, 194, 178, 0.4),
-      0 4px 14px -4px rgba(0, 194, 178, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.12);
 
     &:not(:disabled):hover {
-      box-shadow:
-        0 0 0 1px rgba(0, 194, 178, 0.6),
-        0 6px 20px -4px rgba(0, 194, 178, 0.5),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
-      filter: brightness(1.08);
+      background: $accent-glow;
     }
   }
 

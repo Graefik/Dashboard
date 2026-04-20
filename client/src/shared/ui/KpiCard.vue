@@ -11,11 +11,13 @@ interface Props {
   trend?: number[];
   tone?: "accent" | "success" | "warning" | "danger" | "info";
   icon?: "requests" | "latency" | "connections" | "errors" | "throughput";
+  hero?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   tone: "accent",
   delta: 0,
+  hero: false,
 });
 
 const toneColor: Record<NonNullable<Props["tone"]>, string> = {
@@ -70,7 +72,7 @@ const sparkOptions = computed<ApexOptions>(() => {
 </script>
 
 <template>
-  <article class="kpi" :class="`kpi--${tone}`">
+  <article class="kpi" :class="[`kpi--${tone}`, { 'kpi--hero': hero }]">
     <div class="kpi__head">
       <div class="kpi__icon" aria-hidden="true">
         <svg v-if="icon === 'requests'" viewBox="0 0 20 20" fill="none">
@@ -176,38 +178,28 @@ const sparkOptions = computed<ApexOptions>(() => {
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      var(--tone) 50%,
-      transparent 100%
-    );
-    opacity: 0.5;
+    bottom: 0;
+    width: 2px;
+    background: var(--tone);
+    opacity: 0;
     transition: opacity 0.2s $ease-out;
   }
 
-  &::after {
-    content: "";
-    position: absolute;
-    top: -30%;
-    right: -20%;
-    width: 50%;
-    height: 100%;
-    background: radial-gradient(circle, var(--tone) 0%, transparent 70%);
-    opacity: 0.08;
-    filter: blur(20px);
-    pointer-events: none;
+  &--hero {
+    border-color: $border-accent;
+
+    &::before {
+      opacity: 0.9;
+    }
   }
 
   &:hover {
     border-color: rgba(255, 255, 255, 0.12);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
+  }
 
-    &::before {
-      opacity: 1;
-    }
+  &--hero:hover {
+    border-color: $border-accent;
   }
 
   &--accent {
