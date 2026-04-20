@@ -18,18 +18,18 @@ certificats).
 
 ## 2. Stack
 
-| Couche | Techno |
-|---|---|
-| Frontend | Vue 3 + TypeScript + Vite + SCSS |
-| UI primitives | Reka UI (headless, Dialog / DropdownMenu / …) |
-| Charts temps réel | uPlot (timeline, percentiles) |
-| Charts catégoriels | ApexCharts (donut, bar horizontal, sparklines KPI) |
-| Formulaires | vee-validate + zod |
-| Routing | vue-router |
-| Backend | Go 1.24 + Gin |
-| ORM | Gorm + Gormigrate |
-| DB (V1) | MySQL ; (V2) + InfluxDB pour l'historique métriques |
-| Dev | Docker Compose + Air (hot-reload Go) + Vite HMR |
+| Couche             | Techno                                              |
+| ------------------ | --------------------------------------------------- |
+| Frontend           | Vue 3 + TypeScript + Vite + SCSS                    |
+| UI primitives      | Reka UI (headless, Dialog / DropdownMenu / …)       |
+| Charts temps réel  | uPlot (timeline, percentiles)                       |
+| Charts catégoriels | ApexCharts (donut, bar horizontal, sparklines KPI)  |
+| Formulaires        | vee-validate + zod                                  |
+| Routing            | vue-router                                          |
+| Backend            | Go 1.24 + Gin                                       |
+| ORM                | Gorm + Gormigrate                                   |
+| DB (V1)            | MySQL ; (V2) + InfluxDB pour l'historique métriques |
+| Dev                | Docker Compose + Air (hot-reload Go) + Vite HMR     |
 
 ## 3. Layout du repo
 
@@ -340,6 +340,15 @@ client/src/
 - Pas de docstring multi-paragraphes.
 - Documentation produit dans `README.md`. Documentation agent dans
   `CLAUDE.md`. C'est tout.
+
+## Principes de code - Obligatoire
+
+Respecter les principes suivants dans tout le code :
+
+- **DRY** (Don't Repeat Yourself) : pas de duplication, extraire les logiques communes
+- **KISS** (Keep It Simple, Stupid) : solutions simples, pas de sur-ingenierie
+- **SOLID** : responsabilite unique, ouvert/ferme, substitution, segregation d'interfaces, inversion de dependances
+- **Pas de magic strings/numbers** : utiliser des constantes nommees (`const MAX_RETRIES = 3`, pas `3` en dur dans le code)
 
 ## 7. Commandes utiles
 

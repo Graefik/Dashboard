@@ -7,41 +7,18 @@ import {
   DialogRoot,
   DialogTitle,
 } from "reka-ui";
+import CommandEmpty from "@/shared/components/command-palette/CommandEmpty.vue";
+import CommandItem from "@/shared/components/command-palette/CommandItem.vue";
+import { commands, type Cmd } from "@/shared/components/command-palette/commands.data";
 
 interface Props {
   open: boolean;
 }
 const props = defineProps<Props>();
-const emit = defineEmits<{ "update:open": [v: boolean]; navigate: [to: string] }>();
-
-interface Cmd {
-  id: string;
-  group: "Navigation" | "Infrastructure" | "Actions" | "Settings";
-  label: string;
-  hint?: string;
-  shortcut?: string;
-  to?: string;
-}
-
-const commands: Cmd[] = [
-  { id: "nav-overview", group: "Navigation", label: "Overview", hint: "Dashboard principal", to: "/" },
-  { id: "nav-logs", group: "Navigation", label: "Logs", hint: "Stream temps réel", to: "/logs" },
-  { id: "nav-alerts", group: "Navigation", label: "Alerts", hint: "Alertes et règles", to: "/alerts" },
-  { id: "nav-settings", group: "Navigation", label: "Settings", hint: "Configuration", to: "/settings" },
-
-  { id: "infra-routers", group: "Infrastructure", label: "Routers" },
-  { id: "infra-services", group: "Infrastructure", label: "Services" },
-  { id: "infra-middlewares", group: "Infrastructure", label: "Middlewares" },
-  { id: "infra-certs", group: "Infrastructure", label: "Certificates" },
-
-  { id: "act-refresh", group: "Actions", label: "Actualiser les panneaux", shortcut: "R" },
-  { id: "act-export", group: "Actions", label: "Exporter le dashboard", shortcut: "⌘ E" },
-  { id: "act-panel", group: "Actions", label: "Ajouter un panneau", shortcut: "⌘ N" },
-  { id: "act-theme", group: "Actions", label: "Basculer le thème" },
-
-  { id: "set-switch-instance", group: "Settings", label: "Changer d'instance" },
-  { id: "set-shortcuts", group: "Settings", label: "Raccourcis clavier", shortcut: "?" },
-];
+const emit = defineEmits<{
+  "update:open": [v: boolean];
+  navigate: [to: string];
+}>();
 
 const query = ref("");
 const activeIdx = ref(0);
@@ -64,8 +41,6 @@ const grouped = computed(() => {
   return Array.from(m.entries());
 });
 
-const flatList = computed(() => filtered.value);
-
 watch(query, () => (activeIdx.value = 0));
 watch(
   () => props.open,
@@ -73,21 +48,19 @@ watch(
     if (v) {
       query.value = "";
       activeIdx.value = 0;
-      // focus géré par autofocus sur l'input à l'ouverture
       requestAnimationFrame(() => inputEl.value?.focus());
     }
   },
 );
 
 const close = () => emit("update:open", false);
-
 const run = (cmd: Cmd) => {
   if (cmd.to) emit("navigate", cmd.to);
   close();
 };
 
 const onKey = (e: KeyboardEvent) => {
-  const n = flatList.value.length;
+  const n = filtered.value.length;
   if (!n) return;
   if (e.key === "ArrowDown") {
     e.preventDefault();
@@ -97,12 +70,11 @@ const onKey = (e: KeyboardEvent) => {
     activeIdx.value = (activeIdx.value - 1 + n) % n;
   } else if (e.key === "Enter") {
     e.preventDefault();
-    const cmd = flatList.value[activeIdx.value];
+    const cmd = filtered.value[activeIdx.value];
     if (cmd) run(cmd);
   }
 };
 
-// Raccourci global ⌘K / Ctrl+K
 const onGlobalKey = (e: KeyboardEvent) => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
     e.preventDefault();
@@ -113,8 +85,7 @@ const onGlobalKey = (e: KeyboardEvent) => {
 onMounted(() => window.addEventListener("keydown", onGlobalKey));
 onBeforeUnmount(() => window.removeEventListener("keydown", onGlobalKey));
 
-// Index global au sein du filtre — sert à distinguer le surlignage
-const flatIndex = (cmd: Cmd) => flatList.value.indexOf(cmd);
+const flatIndex = (cmd: Cmd) => filtered.value.indexOf(cmd);
 </script>
 
 <template>
@@ -123,21 +94,11 @@ const flatIndex = (cmd: Cmd) => flatList.value.indexOf(cmd);
       <DialogOverlay class="cmdk__overlay" />
       <DialogContent class="cmdk__content" @keydown="onKey">
         <DialogTitle class="cmdk__sr">Command palette</DialogTitle>
+
         <div class="cmdk__search">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            aria-hidden="true"
-          >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
             <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.5" />
-            <path
-              d="m11 11 3.5 3.5"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-            />
+            <path d="m11 11 3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
           </svg>
           <input
             ref="inputEl"
@@ -151,36 +112,18 @@ const flatIndex = (cmd: Cmd) => flatList.value.indexOf(cmd);
         </div>
 
         <div class="cmdk__list" role="listbox">
-          <div v-if="!flatList.length" class="cmdk__empty">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-              <circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.3" />
-              <path
-                d="m18 18 5 5"
-                stroke="currentColor"
-                stroke-width="1.3"
-                stroke-linecap="round"
-              />
-            </svg>
-            <p>Aucun résultat pour <span class="mono">«&nbsp;{{ query }}&nbsp;»</span></p>
-          </div>
+          <CommandEmpty v-if="!filtered.length" :query="query" />
 
           <div v-for="[group, items] in grouped" :key="group" class="cmdk__group">
             <div class="cmdk__group-title">{{ group }}</div>
-            <button
+            <CommandItem
               v-for="cmd in items"
               :key="cmd.id"
-              type="button"
-              class="cmdk__item"
-              :class="{ 'cmdk__item--active': flatIndex(cmd) === activeIdx }"
-              @mouseenter="activeIdx = flatIndex(cmd)"
-              @click="run(cmd)"
-              role="option"
-              :aria-selected="flatIndex(cmd) === activeIdx"
-            >
-              <span class="cmdk__item-label">{{ cmd.label }}</span>
-              <span v-if="cmd.hint" class="cmdk__item-hint">{{ cmd.hint }}</span>
-              <kbd v-if="cmd.shortcut" class="cmdk__item-kbd">{{ cmd.shortcut }}</kbd>
-            </button>
+              :cmd="cmd"
+              :active="flatIndex(cmd) === activeIdx"
+              @hover="activeIdx = flatIndex(cmd)"
+              @select="run(cmd)"
+            />
           </div>
         </div>
 
@@ -275,21 +218,6 @@ const flatIndex = (cmd: Cmd) => flatList.value.indexOf(cmd);
     padding: 0.6rem 0.6rem 0.8rem;
   }
 
-  &__empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.8rem;
-    padding: 4rem 2rem;
-    color: $text-muted;
-    font-size: 1.3rem;
-    text-align: center;
-
-    p {
-      margin: 0;
-    }
-  }
-
   &__group {
     & + & {
       margin-top: 0.6rem;
@@ -306,60 +234,6 @@ const flatIndex = (cmd: Cmd) => flatList.value.indexOf(cmd);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     font-weight: 500;
-  }
-
-  &__item {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 1rem;
-    width: 100%;
-    padding: 0.8rem 1rem;
-    background: transparent;
-    border: 0;
-    border-radius: $radius-sm;
-    color: $text-secondary;
-    text-align: left;
-    cursor: pointer;
-    font-family: $font-sans;
-    font-size: 1.35rem;
-    transition: background 0.1s $ease-out, color 0.1s $ease-out;
-
-    &--active {
-      background: $accent-soft;
-      color: $text-primary;
-
-      .cmdk__item-hint {
-        color: $text-secondary;
-      }
-
-      .cmdk__item-kbd {
-        color: $accent-glow;
-        border-color: $border-accent;
-      }
-    }
-  }
-
-  &__item-label {
-    color: inherit;
-    font-weight: 500;
-  }
-
-  &__item-hint {
-    color: $text-muted;
-    font-size: 1.15rem;
-    text-align: right;
-    justify-self: end;
-  }
-
-  &__item-kbd {
-    font-family: $font-mono;
-    font-size: 1rem;
-    padding: 0.15rem 0.5rem;
-    background: $bg-inset;
-    border: 1px solid $border-subtle;
-    color: $text-muted;
-    border-radius: $radius-xs;
   }
 
   &__foot {
@@ -403,12 +277,8 @@ const flatIndex = (cmd: Cmd) => flatList.value.indexOf(cmd);
 }
 
 @keyframes cmdk-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes cmdk-in {
