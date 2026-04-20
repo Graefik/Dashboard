@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import type { ApexOptions } from "apexcharts";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import Panel from "@/shared/ui/Panel.vue";
 import { baseChart, series } from "@/features/dashboard/theme";
+import { useMetrics } from "@/features/dashboard/composables/useMetrics";
 
-const data = ref([73245, 18420, 6210, 892, 148]);
+const { overview } = useMetrics();
+
+const data = computed<number[]>(() => {
+  const sc = overview.value?.statusCodes;
+  if (!sc) return [0, 0, 0, 0, 0];
+  return [sc.c2xx, sc.c3xx, sc.c4xx, sc.c5xx, sc.timeouts];
+});
 
 const options = computed<ApexOptions>(() => ({
   ...baseChart,
@@ -70,7 +77,7 @@ const legend = [
 <template>
   <Panel
     title="Status codes"
-    subtitle="Distribution sur 6h"
+    subtitle="Cumul depuis le dernier reload Traefik"
     eyebrow="HTTP"
     :span="4"
     pad="tight"

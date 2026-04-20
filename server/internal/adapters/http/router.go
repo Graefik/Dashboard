@@ -6,10 +6,16 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+
+	"back-dashboard/internal/adapters/http/middleware"
 )
 
 type Deps struct {
 	Auth         *AuthHandler
+	Observe      *ObserveHandler
+	Metrics      *MetricsHandler
+	System       *SystemHandler
+	JWTSecret    string
 	AllowOrigins []string
 }
 
@@ -31,8 +37,28 @@ func NewRouter(deps Deps) *gin.Engine {
 
 	api := r.Group("/api")
 	{
+		// ── Public (auth) ───────────────────────────────
 		auth := api.Group("/auth")
 		auth.POST("/login", deps.Auth.Login)
+
+		// ── Protégé (Bearer JWT) ────────────────────────
+		protected := api.Group("")
+		protected.Use(middleware.JWTAuth(deps.JWTSecret))
+		{
+			protected.GET("/overview", deps.Observe.Overview)
+
+			httpGroup := protected.Group("/http")
+			httpGroup.GET("/routers", deps.Observe.Routers)
+			httpGroup.GET("/services", deps.Observe.Services)
+
+			if deps.Metrics != nil {
+				metricsGroup := protected.Group("/metrics")
+				metricsGroup.GET("/overview", deps.Metrics.Overview)
+			}
+
+			system := protected.Group("/system")
+			system.GET("/info", deps.System.Info)
+		}
 	}
 
 	return r

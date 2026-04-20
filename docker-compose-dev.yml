@@ -40,6 +40,19 @@ services:
       - ADMIN_USERNAME=admin
       - ADMIN_PASSWORD_LENGTH=32
       - CORS_ALLOW_ORIGINS=http://localhost:5173,http://localhost:5178
+      - TRAEFIK_API_URL=https://traefik.maillet.bzh
+      - TRAEFIK_API_USERNAME=admin
+      - TRAEFIK_API_PASSWORD=admin
+      - TRAEFIK_API_TIMEOUT_SEC=5
+      # Metrics Prometheus : route dédiée /graefik-metrics exposée en HTTPS
+      # via dynamic.yml côté Traefik (rewrite vers :8082/metrics + BasicAuth).
+      - TRAEFIK_METRICS_URL=https://traefik.maillet.bzh/graefik-metrics
+      - TRAEFIK_METRICS_USERNAME=admin
+      - TRAEFIK_METRICS_PASSWORD=admin
+      - METRICS_SCRAPE_INTERVAL_SEC=10
+      - METRICS_RETENTION_MINUTES=60
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: air
     depends_on:
       mysql:

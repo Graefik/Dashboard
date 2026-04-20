@@ -73,3 +73,10 @@
     color: $text-primary !important;
   }
 }
+
+// Force le centrage vertical des data labels (horizontal bars).
+// Apex laisse la baseline par défaut ce qui décale visuellement.
+.apexcharts-datalabels text,
+.apexcharts-data-labels text {
+  dominant-baseline: central !important;
+}

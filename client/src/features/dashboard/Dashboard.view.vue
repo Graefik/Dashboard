@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DashboardHead from "@/features/dashboard/components/DashboardHead.vue";
 import KpiRow from "@/features/dashboard/components/KpiRow.vue";
-import LatencyPanel from "@/features/dashboard/components/LatencyPanel.vue";
+import RouterDistributionPanel from "@/features/dashboard/components/RouterDistributionPanel.vue";
 import ServicesTablePanel from "@/features/dashboard/components/ServicesTablePanel.vue";
 import StatusCodesPanel from "@/features/dashboard/components/StatusCodesPanel.vue";
 import TimelinePanel from "@/features/dashboard/components/TimelinePanel.vue";
@@ -15,8 +15,8 @@ import TopRoutersPanel from "@/features/dashboard/components/TopRoutersPanel.vue
     <section class="dashboard__grid">
       <TimelinePanel />
       <StatusCodesPanel />
-      <LatencyPanel />
       <TopRoutersPanel />
+      <RouterDistributionPanel />
       <ServicesTablePanel />
     </section>
   </div>

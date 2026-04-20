@@ -3,17 +3,27 @@ interface Chip {
   label: string;
   color: string;
   dash?: boolean;
+  muted?: boolean;
 }
 defineProps<{ chips: Chip[] }>();
 </script>
 
 <template>
   <div class="chips">
-    <span v-for="chip in chips" :key="chip.label" class="chips__chip">
+    <span
+      v-for="chip in chips"
+      :key="chip.label"
+      class="chips__chip"
+      :class="{ 'chips__chip--muted': chip.muted }"
+      :title="chip.muted ? 'Aucune donnée sur la période' : undefined"
+    >
       <span
         class="chips__dot"
         :class="{ 'chips__dot--dash': chip.dash }"
-        :style="{ background: chip.dash ? 'transparent' : chip.color, borderColor: chip.color }"
+        :style="{
+          background: chip.dash ? 'transparent' : chip.color,
+          borderColor: chip.color,
+        }"
       ></span>
       {{ chip.label }}
     </span>
@@ -36,6 +46,18 @@ defineProps<{ chips: Chip[] }>();
     font-family: $font-mono;
     font-size: 1.05rem;
     color: $text-secondary;
+    transition:
+      opacity 0.15s $ease-out,
+      color 0.15s $ease-out;
+
+    &--muted {
+      opacity: 0.4;
+      color: $text-faint;
+
+      .chips__dot {
+        filter: grayscale(1);
+      }
+    }
   }
 
   &__dot {

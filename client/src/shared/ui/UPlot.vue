@@ -61,6 +61,19 @@ const buildSeries = (): uPlot.Series[] => [
 const renderTooltip = (u: uPlot) => {
   if (!tooltip.value || !root.value) return;
   const { left, idx } = u.cursor;
+
+  // Masque/montre chaque cursor point selon sa valeur raw.
+  // uPlot évalue `cursor.points.size/show` uniquement à l'init, donc on
+  // manipule directement le DOM. Les points sont dans `.u-over > .u-cursor-pt`
+  // dans le même ordre que les séries (un par série y, série 0 = x exclue).
+  const pts = (u.root as HTMLElement).querySelectorAll<HTMLElement>(
+    ".u-over .u-cursor-pt",
+  );
+  pts.forEach((pt, i) => {
+    const raw = idx == null ? null : (props.data[i + 1] ?? [])[idx];
+    pt.style.display = raw != null && raw > 0 ? "" : "none";
+  });
+
   if (idx == null || left == null || left < 0) {
     tooltip.value.style.opacity = "0";
     return;
@@ -69,7 +82,9 @@ const renderTooltip = (u: uPlot) => {
   const rows = props.series
     .map((s, i) => {
       const raw = (props.data[i + 1] ?? [])[idx];
-      if (raw == null) return "";
+      // skip les rows à valeur nulle ou 0 — évite d'afficher
+      // "4xx · 0.0 r/s" quand il n'y a pas eu de 4xx à ce point
+      if (raw == null || raw === 0) return "";
       const v = props.yFormatter ? props.yFormatter(raw) : raw.toLocaleString("fr-FR");
       return `<div class="uplot-tt__row">
         <span class="uplot-tt__dot" style="background:${s.color}"></span>
@@ -78,6 +93,11 @@ const renderTooltip = (u: uPlot) => {
       </div>`;
     })
     .join("");
+  // aucune série active à ce point → on masque le tooltip complètement
+  if (!rows) {
+    tooltip.value.style.opacity = "0";
+    return;
+  }
   const head = props.time
     ? formatTime(xVal as number)
     : props.xFormatter
@@ -101,6 +121,9 @@ const buildOptions = (): uPlot.Options => ({
   cursor: {
     drag: { x: false, y: false },
     points: {
+      // La visibilité conditionnelle par point est gérée dans le hook
+      // setCursor (renderTooltip) car uPlot évalue size/show uniquement
+      // à l'init.
       size: 8,
       width: 2,
       stroke: (_u: any, sIdx: number) =>

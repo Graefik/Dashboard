@@ -7,10 +7,10 @@ const route = useRoute();
 const breadcrumb = computed(() => {
   const name = (route.name as string) || "overview";
   const map: Record<string, string[]> = {
-    home: ["Observatory", "Overview"],
-    overview: ["Observatory", "Overview"],
+    home: ["Overview"],
+    overview: ["Overview"],
   };
-  return map[name] || ["Observatory", name];
+  return map[name] || [name];
 });
 </script>
 

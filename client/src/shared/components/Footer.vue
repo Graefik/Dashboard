@@ -1,46 +1,42 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { useSystem } from "@/shared/system/useSystem";
+
+const { info, connected } = useSystem();
 
 const now = ref(new Date());
-setInterval(() => (now.value = new Date()), 1000);
+let timer: number | undefined;
+onMounted(() => {
+  timer = window.setInterval(() => (now.value = new Date()), 1000);
+});
+onBeforeUnmount(() => {
+  if (timer !== undefined) clearInterval(timer);
+});
 
-const items = computed(() => [
-  { label: "STATUS", value: "healthy", tone: "success" },
-  { label: "API", value: "v0.1.0-rc.3", tone: "muted" },
-  { label: "LATENCY", value: "p95 42ms", tone: "muted" },
-  { label: "REGION", value: "eu-west-3", tone: "muted" },
-  { label: "BUILD", value: "go1.22.4", tone: "accent" },
-]);
+// URL Traefik sans le schéma, façon "host"
+const traefikHost = computed(() => {
+  const url = info.value?.traefikURL;
+  if (!url) return "…";
+  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+});
+
+const statusLabel = computed(() => (connected.value ? "Connected" : "Offline"));
+const statusTone = computed(() => (connected.value ? "success" : "danger"));
 </script>
 
 <template>
   <footer class="statusbar">
     <div class="statusbar__left">
-      <span class="statusbar__item statusbar__item--health">
+      <span class="statusbar__item" :class="`statusbar__item--${statusTone}`">
         <span class="statusbar__dot" aria-hidden="true"></span>
-        <span class="statusbar__label">Connected</span>
+        <span class="statusbar__label">{{ statusLabel }}</span>
         <span class="statusbar__sep">·</span>
-        <span class="statusbar__value mono">wss://graefik.local</span>
-      </span>
-    </div>
-
-    <div class="statusbar__center">
-      <span
-        v-for="item in items.slice(1)"
-        :key="item.label"
-        class="statusbar__item"
-      >
-        <span class="statusbar__label">{{ item.label }}</span>
-        <span class="statusbar__value mono" :class="`statusbar__value--${item.tone}`">{{
-          item.value
-        }}</span>
+        <span class="statusbar__value mono">{{ traefikHost }}</span>
       </span>
     </div>
 
     <div class="statusbar__right">
-      <span class="statusbar__item mono">
-        © {{ now.getFullYear() }} Graefik
-      </span>
+      <span class="statusbar__item mono">© {{ now.getFullYear() }} Graefik</span>
     </div>
   </footer>
 </template>
@@ -62,17 +58,10 @@ const items = computed(() => [
   bottom: 0;
 
   &__left,
-  &__center,
   &__right {
     display: flex;
     align-items: center;
     gap: 1.8rem;
-  }
-
-  &__center {
-    @media (max-width: 900px) {
-      display: none;
-    }
   }
 
   &__item {
@@ -81,8 +70,18 @@ const items = computed(() => [
     gap: 0.6rem;
     white-space: nowrap;
 
-    &--health {
+    &--success {
       color: $severity-success;
+    }
+
+    &--danger {
+      color: $severity-danger;
+
+      .statusbar__dot {
+        background: $severity-danger;
+        box-shadow: 0 0 6px $severity-danger;
+        animation-duration: 0.8s;
+      }
     }
   }
 
@@ -109,16 +108,6 @@ const items = computed(() => [
   &__value {
     color: $text-secondary;
     font-weight: 500;
-
-    &--success {
-      color: $severity-success;
-    }
-    &--accent {
-      color: $accent-glow;
-    }
-    &--muted {
-      color: $text-secondary;
-    }
   }
 }
 </style>

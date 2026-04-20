@@ -16,6 +16,24 @@ type Config struct {
 	AdminPassLength int
 	JWTSecret       string
 	JWTTTL          time.Duration
+	Traefik         Traefik
+	Metrics         Metrics
+}
+
+type Traefik struct {
+	BaseURL  string
+	Username string
+	Password string
+	Timeout  time.Duration
+}
+
+type Metrics struct {
+	URL              string
+	Username         string
+	Password         string
+	Timeout          time.Duration
+	ScrapeInterval   time.Duration
+	RetentionMinutes int
 }
 
 type DB struct {
@@ -41,6 +59,20 @@ func Load() (*Config, error) {
 			Password: getEnv("DB_PASSWORD", "dashboard_pwd"),
 			Name:     getEnv("DB_NAME", "dashboard_dev"),
 		},
+		Traefik: Traefik{
+			BaseURL:  getEnv("TRAEFIK_API_URL", ""),
+			Username: getEnv("TRAEFIK_API_USERNAME", ""),
+			Password: getEnv("TRAEFIK_API_PASSWORD", ""),
+			Timeout:  time.Duration(getEnvInt("TRAEFIK_API_TIMEOUT_SEC", 5)) * time.Second,
+		},
+		Metrics: Metrics{
+			URL:              getEnv("TRAEFIK_METRICS_URL", ""),
+			Username:         getEnv("TRAEFIK_METRICS_USERNAME", ""),
+			Password:         getEnv("TRAEFIK_METRICS_PASSWORD", ""),
+			Timeout:          time.Duration(getEnvInt("TRAEFIK_METRICS_TIMEOUT_SEC", 5)) * time.Second,
+			ScrapeInterval:   time.Duration(getEnvInt("METRICS_SCRAPE_INTERVAL_SEC", 10)) * time.Second,
+			RetentionMinutes: getEnvInt("METRICS_RETENTION_MINUTES", 60),
+		},
 	}
 
 	if cfg.JWTSecret == "" {
@@ -48,6 +80,9 @@ func Load() (*Config, error) {
 	}
 	if len(cfg.JWTSecret) < 16 {
 		return nil, fmt.Errorf("JWT_SECRET doit faire >= 16 caractères")
+	}
+	if cfg.Traefik.BaseURL == "" {
+		return nil, fmt.Errorf("TRAEFIK_API_URL est requis")
 	}
 	return cfg, nil
 }

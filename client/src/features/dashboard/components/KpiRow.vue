@@ -1,50 +1,77 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed } from "vue";
 import KpiCard from "@/shared/ui/KpiCard.vue";
-import { spark } from "@/features/dashboard/utils/mock";
+import { useMetrics } from "@/features/dashboard/composables/useMetrics";
 
-const kpis = ref([
-  {
-    label: "Requests / sec",
-    value: "1 284",
-    unit: "req/s",
-    delta: 8.4,
-    deltaLabel: "vs. 6h",
-    tone: "accent" as const,
-    icon: "requests" as const,
-    trend: spark(1200, 180),
-  },
-  {
-    label: "Latency p95",
-    value: "42",
-    unit: "ms",
-    delta: -3.1,
-    deltaLabel: "vs. 6h",
-    tone: "info" as const,
-    icon: "latency" as const,
-    trend: spark(45, 10),
-  },
-  {
-    label: "Active connections",
-    value: "3 412",
-    unit: "conns",
-    delta: 2.6,
-    deltaLabel: "vs. 6h",
-    tone: "success" as const,
-    icon: "connections" as const,
-    trend: spark(3300, 250),
-  },
-  {
-    label: "Error rate",
-    value: "0.42",
-    unit: "%",
-    delta: 12.8,
-    deltaLabel: "vs. 6h",
-    tone: "danger" as const,
-    icon: "errors" as const,
-    trend: spark(18, 8),
-  },
-]);
+const { overview } = useMetrics();
+
+const fmtNumber = (n: number) => {
+  if (n >= 1000) return n.toLocaleString("fr-FR", { maximumFractionDigits: 0 });
+  return n.toLocaleString("fr-FR", { maximumFractionDigits: 1 });
+};
+
+const kpis = computed(() => {
+  const k = overview.value?.kpis;
+  const trend = (): number[] => [];
+  if (!k) {
+    return [
+      { label: "Requests / sec", value: "—", unit: "req/s", delta: 0, tone: "accent" as const, icon: "requests" as const, trend: trend() },
+      { label: "Latency p95", value: "—", unit: "ms", delta: 0, tone: "info" as const, icon: "latency" as const, trend: trend() },
+      { label: "Active connections", value: "—", unit: "conns", delta: 0, tone: "success" as const, icon: "connections" as const, trend: trend() },
+      { label: "Error rate", value: "—", unit: "%", delta: 0, tone: "danger" as const, icon: "errors" as const, trend: trend() },
+    ];
+  }
+  const reqSeries = overview.value?.requests.series ?? {};
+  const latencySeries = overview.value?.latency.p95 ?? [];
+
+  const all2xx = reqSeries["2xx"] ?? [];
+  const all4xx = reqSeries["4xx"] ?? [];
+  const all5xx = reqSeries["5xx"] ?? [];
+  const total = all2xx.map((v, i) => v + (all4xx[i] ?? 0) + (all5xx[i] ?? 0));
+
+  return [
+    {
+      label: "Requests / sec",
+      value: fmtNumber(k.rps),
+      unit: "req/s",
+      delta: +k.rpsDeltaPct.toFixed(1),
+      deltaLabel: "vs. 5m",
+      tone: "accent" as const,
+      icon: "requests" as const,
+      trend: total.slice(-24),
+    },
+    {
+      label: "Latency p95",
+      value: fmtNumber(k.latencyP95Ms),
+      unit: "ms",
+      delta: +k.latencyP95DeltaPct.toFixed(1),
+      deltaLabel: "vs. 5m",
+      tone: "info" as const,
+      icon: "latency" as const,
+      trend: latencySeries.slice(-24),
+    },
+    {
+      label: "Active connections",
+      value: fmtNumber(k.connections),
+      unit: "conns",
+      delta: +k.connectionsDeltaPct.toFixed(1),
+      deltaLabel: "vs. 5m",
+      tone: "success" as const,
+      icon: "connections" as const,
+      trend: [],
+    },
+    {
+      label: "Error rate",
+      value: k.errorRatePct.toFixed(2),
+      unit: "%",
+      delta: +k.errorRateDeltaPct.toFixed(1),
+      deltaLabel: "vs. 5m",
+      tone: "danger" as const,
+      icon: "errors" as const,
+      trend: (reqSeries["5xx"] ?? []).slice(-24),
+    },
+  ];
+});
 </script>
 
 <template>
@@ -56,7 +83,7 @@ const kpis = ref([
       :value="kpi.value"
       :unit="kpi.unit"
       :delta="kpi.delta"
-      :delta-label="kpi.deltaLabel"
+      :delta-label="(kpi as any).deltaLabel"
       :tone="kpi.tone"
       :icon="kpi.icon"
       :trend="kpi.trend"
